@@ -1,0 +1,18 @@
+[
+    {
+        "task": "shopping",
+        "done": false
+    },
+    {
+        "task": "shopping",
+        "done": false
+    },
+    {
+        "task": "exercise",
+        "done": false
+    },
+    {
+        "task": "reading",
+        "done": false
+    }
+]
