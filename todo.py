@@ -1,4 +1,7 @@
-import click
+
+
+
+import streamlit as st
 import json
 import os
 
@@ -14,62 +17,27 @@ def save_tasks(tasks):
     with open(TODO_FILE, "w") as file:
         json.dump(tasks, file, indent=4)
 
-@click.group()
-def cli():
-    """Simple Todo List Manager"""
-    pass
+st.title("✅ Simple Todo List")
 
-@click.command()
-@click.argument("task")
-def add(task):
-    """Add a new task to the list"""
-    tasks = load_tasks()
-    tasks.append({"task": task, "done": False})
-    save_tasks(tasks)
-    click.echo(f"Task added successfully: {task}")
+# Load tasks
+tasks = load_tasks()
 
-@click.command()
-def list():
-    """List all tasks"""
-    tasks = load_tasks()
-    if not tasks:
-        click.echo("No tasks found.")
-    else:
-        for i, task in enumerate(tasks, start=1):
-            status = "✔" if task["done"] else "✘"
-            click.echo(f"{i}. {task['task']} [{status}]")
-
-@click.command()
-@click.argument("task_number", type=int)
-def remove(task_number):
-    """Remove a task by its number"""
-    tasks = load_tasks()
-    if 1 <= task_number <= len(tasks):
-        removed_task = tasks.pop(task_number - 1)
+# Add new task
+new_task = st.text_input("Enter a new task:")
+if st.button("Add Task"):
+    if new_task:
+        tasks.append({"task": new_task, "done": False})
         save_tasks(tasks)
-        click.echo(f"Removed task: {removed_task['task']}")
-    else:
-        click.echo("Invalid task number.")
+        st.success(f"Task added: {new_task}")
+        st.experimental_rerun()
 
-@click.command()
-@click.argument("task_number", type=int)
-def complete(task_number):
-    """Mark a task as completed"""
-    tasks = load_tasks()
-    if 1 <= task_number <= len(tasks):
-        tasks[task_number - 1]["done"] = True
+# Display tasks
+st.subheader("Your Tasks")
+for i, task in enumerate(tasks):
+    col1, col2 = st.columns([4, 1])
+    col1.write(f"{i+1}. {task['task']}")
+    if col2.button("✅ Done", key=i):
+        tasks.pop(i)
         save_tasks(tasks)
-        click.echo(f"Task {task_number} marked as completed.")
-    else:
-        click.echo("Invalid task number.")
-
-# Register commands
-cli.add_command(add)
-cli.add_command(list)
-cli.add_command(remove)
-cli.add_command(complete)
-
-if __name__ == "__main__":
-    cli()
-
+        st.experimental_rerun()
 
