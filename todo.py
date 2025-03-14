@@ -28,8 +28,48 @@ def add(task):
     save_tasks(tasks)
     click.echo(f"Task added successfully: {task}")
 
+@click.command()
+def list():
+    """List all tasks"""
+    tasks = load_tasks()
+    if not tasks:
+        click.echo("No tasks found.")
+    else:
+        for i, task in enumerate(tasks, start=1):
+            status = "✔" if task["done"] else "✘"
+            click.echo(f"{i}. {task['task']} [{status}]")
+
+@click.command()
+@click.argument("task_number", type=int)
+def remove(task_number):
+    """Remove a task by its number"""
+    tasks = load_tasks()
+    if 1 <= task_number <= len(tasks):
+        removed_task = tasks.pop(task_number - 1)
+        save_tasks(tasks)
+        click.echo(f"Removed task: {removed_task['task']}")
+    else:
+        click.echo("Invalid task number.")
+
+@click.command()
+@click.argument("task_number", type=int)
+def complete(task_number):
+    """Mark a task as completed"""
+    tasks = load_tasks()
+    if 1 <= task_number <= len(tasks):
+        tasks[task_number - 1]["done"] = True
+        save_tasks(tasks)
+        click.echo(f"Task {task_number} marked as completed.")
+    else:
+        click.echo("Invalid task number.")
+
+# Register commands
 cli.add_command(add)
+cli.add_command(list)
+cli.add_command(remove)
+cli.add_command(complete)
 
 if __name__ == "__main__":
     cli()
+
 
